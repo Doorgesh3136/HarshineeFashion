@@ -1,26 +1,22 @@
 # Harshinee Fashion — Mauritius
 
-Website for **Harshinee Fashion**, an Indian ethnic wear and bridal couture boutique in Mauritius.
+Website for **Harshinee Fashion**, an Indian bridal and non-bridal specialist with boutiques at Royal Road, Lallmatie and Bypass, St Julien d'Hotman (both opposite Kalimaye).
 
-It is a single self-contained page (`index.html`) built with Tailwind CSS (CDN), Google Fonts and Font Awesome. You don't need to build anything: open the file, or host it on GitHub Pages.
+It is a single self-contained page (`index.html`) built with Tailwind (CDN), Google Fonts and Font Awesome. There's no build step: open it, or host it on GitHub Pages (Settings → Pages → `main` / root).
 
 ## Features
-- Branded intro loader: a gold mandala draws in, the name is revealed, and curtains open. The full intro plays once per session; repeat visits get a short version, and visitors can tap to skip.
-- Gold/maroon wipe transitions between sections, staggered scroll reveals, a hero line-mask entrance, and a scroll progress bar.
-- Product catalogue with combined category, occasion and price-sort filters, quick view with image thumbnails, a wishlist, and a bag. The bag and wishlist are saved in the browser.
-- Checkout and fitting bookings go straight to **WhatsApp** with the order or booking details already filled in.
-- Respects the "reduce motion" accessibility setting.
+- Intro loader: a gold mandala with a lotus centre draws itself in, the letters reveal, and curtains open. The full version plays once per session, and visitors can tap to skip it.
+- Section transition: silk pleats drop in, a mandala draws itself and the section name appears, then the pleats lift away.
+- 40-piece collection in 6 categories with category tiles, chips, search, price sort and "show more". Cards only show photo, name and price.
+- Bag, wishlist, enquiries and visit requests all go to WhatsApp (5799 0933) with the message pre-filled.
 
-## Editing shop details
-Open `index.html` and find the `SHOP` settings near the top of the main `<script>`:
+## Updating products
+In `index.html`, find the `RAW` list. Each row is:
 
 ```js
-const SHOP = {
-    name: 'Harshinee Fashion',
-    whatsapp: '2304608888',     // WhatsApp number, international format
-    freeDeliveryFrom: 15000,    // Rs
-    promo: { code: 'DIWALI2026', percent: 10 }
-};
+['Name', 'category', price, 'unsplash-photo-id', 'hover-photo-id', 'Tag']
 ```
 
-Products live in the `PRODUCTS` array just below it. The phone numbers and boutique addresses shown in the page text are in the HTML itself.
+Categories are `bridal`, `lehenga`, `saree`, `gown`, `groom` and `men`. To use the shop's own photos, change the `IMG()` helper (or the IDs) so it points at real image files.
+
+**Note:** the photos are Unsplash stock placeholders and the prices are samples. Replace both with Harshinee's real pieces before launch.

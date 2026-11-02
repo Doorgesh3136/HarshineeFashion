@@ -12,13 +12,28 @@ It is a single self-contained page (`index.html`) built with Tailwind (CDN), Goo
 - "How to Shop With Us" steps: browse, WhatsApp, try on in boutique.
 - Bag, wishlist, enquiries and visit requests all go to WhatsApp (5799 0933) with the message pre-filled.
 
-## Updating products
-In `index.html`, find the `RAW` list. Each row is:
+## Admin panel (`/admin`)
+Go to **https://doorgesh3136.github.io/HarshineeFashion/admin/** to add, edit, hide, reorder or delete products, upload photos, and edit the rotating announcements. Then press **Publish**. The site updates in about 1–2 minutes.
 
-```js
-['Name', 'category', price, 'unsplash-photo-id', 'hover-photo-id', 'Tag']
+The site is static (no server), so the admin signs in with a GitHub token instead of a password:
+1. GitHub → Settings → Developer settings → **Fine-grained tokens** → Generate new token.
+2. Repository access: **Only select repositories → HarshineeFashion**.
+3. Permissions → Repository permissions → **Contents: Read and write**.
+4. Paste the token into the admin page. Anyone with the token can edit the site, so keep it private.
+
+Every publish is a normal Git commit, so changes can be reviewed or reverted from the repo history. Uploaded photos are resized to 1400px and saved in `images/`.
+
+## Data file
+Products and announcements live in `data.js` (written by the admin). It can be edited by hand too. Each product looks like:
+
+```json
+{ "id": 1, "name": "Crimson Zari Bridal Lehenga", "category": "bridal", "price": 18500,
+  "img": "images/crimson.jpg", "hover": "1654764746225-e63f5e90facd", "tag": "Bestseller", "hidden": false }
 ```
 
-Categories are `bridal`, `lehenga`, `saree`, `gown`, `groom` and `men`. To use the shop's own photos, change the `IMG()` helper (or the IDs) so it points at real image files.
+Categories are `bridal`, `lehenga`, `saree`, `gown`, `groom` and `men`. A photo can be a repo path (`images/…`), a full URL, or an Unsplash photo ID. Keep `id` unique and unchanged so shoppers' saved bags and wishlists still match.
+
+## 404 page
+`404.html` is the branded "page not found" screen. GitHub Pages serves it automatically for any missing URL.
 
 **Note:** the photos are Unsplash stock placeholders and the prices are samples. Replace both with Harshinee's real pieces before launch.

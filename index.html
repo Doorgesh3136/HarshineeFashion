@@ -830,6 +830,7 @@
         <div><span id="toastTitle" class="font-bold text-warmGold block">Notification</span><span id="toastMsg" class="text-creamAccent/90"></span></div>
     </div>
 
+    <script src="data.js"></script>
     <script>
         /* ==========================================================================
            0. SHOP SETTINGS — edit these to update the site
@@ -839,7 +840,8 @@
             whatsapp: '23057990933'   // international format, no + or spaces
         };
         const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const IMG = (id, w = 800) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
+        const IMG = (id, w = 800) => !id ? '' : /^(https?:)?\/\/|[\/.]/.test(id) ? id : `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
         /* Categories: key → label, tile image */
         const CATEGORIES = [
@@ -853,57 +855,14 @@
         const CAT_LABEL = Object.fromEntries(CATEGORIES.map(c => [c.key, c.label]));
 
         /* ==========================================================================
-           1. PRODUCTS — [name, category, price (Rs), main photo, hover photo, tag]
-              Swap the photo IDs / prices for the shop's real pieces.
+           1. PRODUCTS + ANNOUNCEMENTS come from data.js (edit them at /admin).
+              Photos can be an Unsplash photo ID, a full URL, or a repo path like images/x.jpg
            ========================================================================== */
-        const RAW = [
-            ['Crimson Zari Bridal Lehenga', 'bridal', 18500, '1721324807083-e9ddaa99310e', '1654764746225-e63f5e90facd', 'Bestseller'],
-            ['Royal Red Bridal Lehenga', 'bridal', 21900, '1610047614301-13c63f00c032', '1610047614256-023d7c028d0b', 'New'],
-            ['Wine Velvet Bridal Lehenga', 'bridal', 24500, '1740674570259-a47d713a2976', '1677691257363-eebd2abeafec', ''],
-            ['Red & Gold Bridal Set', 'bridal', 16900, '1677691257363-eebd2abeafec', '1707576618343-26a1b377ca7a', ''],
-            ['Rose Bridal Lehenga', 'bridal', 19500, '1629118477133-b8b1499f2b8a', '1662714802102-9825504458ca', ''],
-            ['Maroon Embroidered Bridal Lehenga', 'bridal', 14900, '1707576618343-26a1b377ca7a', '1737514996816-a034a795febe', ''],
-            ['Ivory & Red Bridal Lehenga', 'bridal', 22500, '1737514996816-a034a795febe', '1610047614301-13c63f00c032', 'New'],
-            ['Heritage Red Bridal Lehenga', 'bridal', 12900, '1662714802102-9825504458ca', '1721324807083-e9ddaa99310e', ''],
-
-            ['Pink Mirror-Work Lehenga', 'lehenga', 5900, '1733937140732-2cc70a1d7017', '1746372283841-dbb3838f9935', 'New'],
-            ['Maroon Sequin Lehenga', 'lehenga', 6500, '1756483488645-5973a1a92e33', '1610047614222-d33c39abfab2', 'Bestseller'],
-            ['Lavender Floral Lehenga', 'lehenga', 4500, '1617039487629-6babdcb2a24b', '1733937140732-2cc70a1d7017', ''],
-            ['Mustard Bandhani Lehenga', 'lehenga', 3900, '1746372283841-dbb3838f9935', '1668371459824-094a960a227d', ''],
-            ['Red Festive Lehenga', 'lehenga', 4900, '1610047614222-d33c39abfab2', '1756483488645-5973a1a92e33', ''],
-            ['Rust Silk Lehenga', 'lehenga', 3500, '1668371459824-094a960a227d', '1617039487629-6babdcb2a24b', ''],
-
-            ['Red Banarasi Silk Saree', 'saree', 4500, '1610030469983-98e550d6193c', '1610030469668-8e9f641aaf27', 'Bestseller'],
-            ['Emerald Silk Saree', 'saree', 3900, '1679006831648-7c9ea12e5807', '1727430228383-aa1fb59db8bf', ''],
-            ['Purple & Gold Kanjeevaram Saree', 'saree', 6500, '1641699862936-be9f49b1c38d', '1610030469983-98e550d6193c', 'New'],
-            ['Coral Silk Saree', 'saree', 2900, '1617627143750-d86bc21e42bb', '1769275061202-cf3ef67d7279', ''],
-            ['Printed Georgette Saree', 'saree', 1900, '1769275061202-cf3ef67d7279', '1617627143750-d86bc21e42bb', ''],
-            ['Wedding Guest Saree', 'saree', 3500, '1727430228383-aa1fb59db8bf', '1679006831648-7c9ea12e5807', ''],
-            ['Red Floral Saree', 'saree', 2500, '1610047520958-b42ebcd2f6cb', '1610030469668-8e9f641aaf27', ''],
-            ['Scarlet Party Saree', 'saree', 3200, '1610030469668-8e9f641aaf27', '1610047520958-b42ebcd2f6cb', ''],
-
-            ['Black & Gold Anarkali', 'gown', 4900, '1761571260010-8aa90a08c934', '1610202305255-746aa5b971c4', 'New'],
-            ['Red Embroidered Anarkali', 'gown', 4200, '1610202305255-746aa5b971c4', '1638457130899-121a2dc59513', ''],
-            ['Blush Pink Anarkali Gown', 'gown', 3800, '1669195987863-f935f728e41b', '1649139798873-683a18de1151', 'Bestseller'],
-            ['Powder Blue Gown', 'gown', 3500, '1616583936499-d4116e7e2e76', '1678536517273-f1ec164966ea', ''],
-            ['Ivory Flared Gown', 'gown', 4500, '1678536517273-f1ec164966ea', '1744833341427-6f2b4eac91ff', ''],
-            ['Sage Embellished Gown', 'gown', 5200, '1744833341427-6f2b4eac91ff', '1756483509254-3cc48a5a15b2', ''],
-            ['Pink Festive Suit', 'gown', 2800, '1649139798873-683a18de1151', '1669195987863-f935f728e41b', ''],
-            ['Red Party Anarkali', 'gown', 3900, '1638457130899-121a2dc59513', '1610202305255-746aa5b971c4', ''],
-
-            ['Ivory Embroidered Groom Sherwani', 'groom', 12900, '1760080838961-4208536db385', '1678805408312-04e5fd7a9dcc', 'Groom'],
-            ['Royal Maroon Sherwani Set', 'groom', 14500, '1576470189712-50fe3ec06b04', '1759906766080-82b785c61f51', 'Bestseller'],
-            ['Complete Groom Sherwani with Safa', 'groom', 15900, '1759906766080-82b785c61f51', '1760080838961-4208536db385', ''],
-            ['Navy Sherwani', 'groom', 9900, '1534217466718-ef4950786e24', '1729347917808-e3e35a462fec', ''],
-            ['White Floral Sherwani', 'groom', 8500, '1678805408312-04e5fd7a9dcc', '1534217466718-ef4950786e24', ''],
-
-            ['Green Embroidered Kurta Set', 'men', 2500, '1727835523545-70ee992b5763', '1727835523550-18478cacefa2', ''],
-            ['Yellow Festive Kurta', 'men', 1900, '1768807478320-fcfd3929acb2', '1768807478287-9e7953cfdca3', 'New'],
-            ['Blue Kurta with Jacket', 'men', 3500, '1767775498862-d4740ce574ce', '1768807478320-fcfd3929acb2', 'Bestseller'],
-            ['Black Kurta Pyjama', 'men', 2200, '1711044871601-301f9b0ecf91', '1744551358303-46edae8b374b', ''],
-            ['Ivory Indo-Western Set', 'men', 6500, '1729347917808-e3e35a462fec', '1727835523550-18478cacefa2', '']
-        ];
-        const PRODUCTS = RAW.map((r, i) => ({ id: i + 1, name: r[0], category: r[1], priceMUR: r[2], imgMain: IMG(r[3]), imgHover: IMG(r[4]), tag: r[5] }));
+        const DATA = window.SITE_DATA || { announcements: [], products: [] };
+        const PRODUCTS = (DATA.products || []).filter(p => !p.hidden).map(p => ({
+            id: p.id, name: p.name, category: p.category, priceMUR: Number(p.price) || 0,
+            imgMain: IMG(p.img), imgHover: IMG(p.hover || p.img), tag: p.tag || ''
+        }));
 
         const store = {
             get(k, f) { try { return JSON.parse(localStorage.getItem(k)) ?? f; } catch (e) { return f; } },
@@ -978,7 +937,7 @@
             const wished = wishlistIds.includes(p.id);
             return `
                 <div class="relative luxury-img-wrapper sheen aspect-[3/4] bg-charcoal overflow-hidden cursor-pointer" onclick="openQuickViewModal(${p.id})">
-                    <img src="${p.imgMain}" alt="${p.name}" loading="lazy" class="card-img w-full h-full object-cover object-top transition-opacity duration-700 group-hover:opacity-0">
+                    <img src="${p.imgMain}" alt="${esc(p.name)}" loading="lazy" class="card-img w-full h-full object-cover object-top transition-opacity duration-700 group-hover:opacity-0">
                     <img src="${p.imgHover}" alt="" aria-hidden="true" loading="lazy" class="w-full h-full object-cover object-top absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                     ${p.tag ? `<span class="absolute top-2.5 left-2.5 z-10 bg-richBurgundy/90 text-warmGold border border-warmGold/40 text-[9px] font-bold px-2 py-0.5 rounded-xs tracking-widest uppercase">${p.tag}</span>` : ''}
                     <button data-wish="${p.id}" onclick="event.stopPropagation(); toggleWishlist(${p.id})" class="absolute top-2.5 right-2.5 z-10 bg-silkVanilla/90 hover:bg-royalMaroon text-richBurgundy hover:text-warmGold w-8 h-8 rounded-full flex items-center justify-center transition-colors shadow-md" aria-label="Save to wishlist">
@@ -991,11 +950,11 @@
                 <div class="p-3 sm:p-4 flex-1 flex flex-col justify-between gap-2">
                     <div>
                         <span class="text-[9px] sm:text-[10px] text-royalMaroon/70 uppercase font-bold tracking-widest block">${CAT_LABEL[p.category]}</span>
-                        <h3 onclick="openQuickViewModal(${p.id})" class="font-playfair font-bold text-richBurgundy text-sm sm:text-base leading-snug cursor-pointer mt-0.5">${p.name}</h3>
+                        <h3 onclick="openQuickViewModal(${p.id})" class="font-playfair font-bold text-richBurgundy text-sm sm:text-base leading-snug cursor-pointer mt-0.5">${esc(p.name)}</h3>
                     </div>
                     <div class="flex items-center justify-between gap-2">
                         <span class="font-playfair font-bold text-royalMaroon text-base sm:text-lg">${rs(p.priceMUR)}</span>
-                        <button onclick="addToCart(${p.id}, this)" class="add-btn px-2.5 sm:px-3 py-1.5 bg-royalMaroon hover:bg-richBurgundy text-warmGold border border-warmGold/40 hover:border-warmGold text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xs transition-all" aria-label="Add ${p.name} to bag">+ Bag</button>
+                        <button onclick="addToCart(${p.id}, this)" class="add-btn px-2.5 sm:px-3 py-1.5 bg-royalMaroon hover:bg-richBurgundy text-warmGold border border-warmGold/40 hover:border-warmGold text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xs transition-all" aria-label="Add ${esc(p.name)} to bag">+ Bag</button>
                     </div>
                 </div>`;
         }
@@ -1147,11 +1106,11 @@
             document.getElementById('quickViewContent').innerHTML = `
                 <div class="space-y-3">
                     <div class="luxury-img-wrapper sheen aspect-[3/4] bg-charcoal rounded-sm overflow-hidden filigree-border">
-                        <img id="qvMainImg" src="${p.imgMain}" alt="${p.name}" class="w-full h-full object-cover object-top transition-opacity duration-300">
+                        <img id="qvMainImg" src="${p.imgMain}" alt="${esc(p.name)}" class="w-full h-full object-cover object-top transition-opacity duration-300">
                     </div>
                     <div class="flex gap-3">
                         ${[p.imgMain, p.imgHover].map((src, i) => `
-                            <button onclick="swapQvImage(this, '${src}')" class="qv-thumb w-14 h-[74px] rounded-xs overflow-hidden border ${i === 0 ? 'border-warmGold' : 'border-warmGold/20'} hover:border-warmGold transition-colors" aria-label="View photo ${i + 1}">
+                            <button data-src="${esc(src)}" onclick="swapQvImage(this, this.dataset.src)" class="qv-thumb w-14 h-[74px] rounded-xs overflow-hidden border ${i === 0 ? 'border-warmGold' : 'border-warmGold/20'} hover:border-warmGold transition-colors" aria-label="View photo ${i + 1}">
                                 <img src="${src}" alt="" class="w-full h-full object-cover object-top">
                             </button>`).join('')}
                     </div>
@@ -1159,7 +1118,7 @@
                 <div class="space-y-5 font-montserrat">
                     <div class="border-b border-warmGold/30 pb-4">
                         <span class="text-[10px] text-warmGold font-bold tracking-[0.2em] uppercase block">${CAT_LABEL[p.category]}</span>
-                        <h3 class="font-playfair text-2xl sm:text-3xl font-bold text-silkVanilla mt-1">${p.name}</h3>
+                        <h3 class="font-playfair text-2xl sm:text-3xl font-bold text-silkVanilla mt-1">${esc(p.name)}</h3>
                         <span class="font-playfair text-2xl text-warmGold font-bold block mt-2">${rs(p.priceMUR)}</span>
                     </div>
                     <p class="text-xs text-creamAccent/70 flex items-center gap-2"><i class="fa-solid fa-ruler text-warmGold"></i> Sizes, colours &amp; alterations — just ask us.</p>
@@ -1168,7 +1127,7 @@
                             <button onclick="addToCart(${p.id}, document.getElementById('qvMainImg')); closeQuickViewModal();" class="flex-1 py-3.5 bg-warmGold hover:bg-softGold text-richBurgundy font-bold text-xs uppercase tracking-[0.2em] rounded-sm transition-all shadow-gold-glow">Add to Bag</button>
                             <button data-wish="${p.id}" onclick="toggleWishlist(${p.id})" class="w-12 border border-warmGold/50 text-warmGold hover:bg-royalMaroon rounded-sm transition-all" aria-label="Save to wishlist"><i class="${wished ? 'fa-solid' : 'fa-regular'} fa-heart"></i></button>
                         </div>
-                        <button onclick="openWhatsApp('Hello Harshinee Fashion, is the ${p.name.replace(/'/g, '')} (${rs(p.priceMUR)}) available?')" class="w-full py-3 bg-emerald-800/60 hover:bg-emerald-700 border border-emerald-500/40 text-white font-bold text-xs uppercase tracking-widest rounded-sm transition-all">
+                        <button onclick="openWhatsApp('Hello Harshinee Fashion, is the ${esc(p.name.replace(/['"\\]/g, ''))} (${rs(p.priceMUR)}) available?')" class="w-full py-3 bg-emerald-800/60 hover:bg-emerald-700 border border-emerald-500/40 text-white font-bold text-xs uppercase tracking-widest rounded-sm transition-all">
                             <i class="fa-brands fa-whatsapp mr-1"></i> Ask About This Piece
                         </button>
                     </div>
@@ -1250,7 +1209,7 @@
                 row.innerHTML = `
                     <img src="${item.imgMain}" alt="" class="w-14 h-16 object-cover object-top rounded-xs border border-warmGold/30">
                     <div class="flex-1">
-                        <h4 class="font-playfair font-bold text-silkVanilla text-sm">${item.name}</h4>
+                        <h4 class="font-playfair font-bold text-silkVanilla text-sm">${esc(item.name)}</h4>
                         <span class="text-xs text-warmGold">${rs(item.priceMUR)}</span>
                         <div class="flex items-center gap-2 mt-2">
                             <button onclick="changeQty(${item.id}, -1)" class="w-6 h-6 bg-richBurgundy text-white font-bold text-xs flex items-center justify-center border border-warmGold/30 hover:border-warmGold" aria-label="Decrease">-</button>
@@ -1312,7 +1271,7 @@
                 row.className = 'bg-royalMaroon p-4 rounded-sm border border-warmGold/20 flex items-center justify-between gap-3';
                 row.innerHTML = `
                     <img src="${item.imgMain}" alt="" class="w-14 h-16 object-cover object-top rounded-xs cursor-pointer" onclick="toggleWishlistDrawer(false); openQuickViewModal(${item.id})">
-                    <div class="flex-1"><h4 class="font-playfair font-bold text-silkVanilla text-sm">${item.name}</h4><span class="text-xs text-warmGold">${rs(item.priceMUR)}</span></div>
+                    <div class="flex-1"><h4 class="font-playfair font-bold text-silkVanilla text-sm">${esc(item.name)}</h4><span class="text-xs text-warmGold">${rs(item.priceMUR)}</span></div>
                     <div class="flex flex-col gap-2 items-end">
                         <button onclick="addToCart(${item.id})" class="px-3 py-1.5 bg-warmGold text-richBurgundy font-bold text-[10px] uppercase rounded-xs hover:bg-softGold transition-colors">+ Bag</button>
                         <button onclick="toggleWishlist(${item.id})" class="text-[10px] text-creamAccent/50 hover:text-warmGold uppercase tracking-wider">Remove</button>
@@ -1425,13 +1384,10 @@
         }, { rootMargin: '-45% 0px -50% 0px' });
         ['hero', 'collections', 'bride-groom', 'visit'].forEach(id => spy.observe(document.getElementById(id)));
 
-        const ANNOUNCEMENTS = [
-            "Bridal & Non-Bridal Specialist • Men's Ethnic Wear • Party Wear",
-            "Now open: Bypass, St Julien d'Hotman (opp. Kalimaye)",
-            'Queries via WhatsApp only — 5799 0933'
-        ];
+        const ANNOUNCEMENTS = (DATA.announcements || []).filter(Boolean);
         let annIdx = 0;
-        setInterval(() => {
+        if (ANNOUNCEMENTS.length) document.getElementById('announceText').innerText = ANNOUNCEMENTS[0];
+        if (ANNOUNCEMENTS.length > 1) setInterval(() => {
             const el = document.getElementById('announceText');
             el.classList.add('is-out');
             setTimeout(() => { annIdx = (annIdx + 1) % ANNOUNCEMENTS.length; el.innerText = ANNOUNCEMENTS[annIdx]; el.classList.remove('is-out'); }, 600);

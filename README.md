@@ -8,6 +8,8 @@ It is a single self-contained page (`index.html`) built with Tailwind (CDN), Goo
 - Intro loader: a gold mandala with a lotus centre draws itself in, the letters reveal, and curtains open. The full version plays once per session, and visitors can tap to skip it.
 - Section transition: silk pleats drop in, a mandala draws itself and the section name appears, then the pleats lift away.
 - 40-piece collection in 6 categories with category tiles, chips, search, price sort and "show more". Cards only show photo, name and price.
+- Gold dot backgrounds (twinkling on the dark sections, subtle antique gold on the cream sections), a slow-turning hero mandala and rising gold dust.
+- "How to Shop With Us" steps: browse, WhatsApp, try on in boutique.
 - Bag, wishlist, enquiries and visit requests all go to WhatsApp (5799 0933) with the message pre-filled.
 
 ## Updating products

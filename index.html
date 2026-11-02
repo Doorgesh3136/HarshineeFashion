@@ -31,6 +31,8 @@
                         royalMaroon: '#4A0817', deepCrimson: '#5A0E1A', richBurgundy: '#2D040D',
                         warmGold: '#D4AF37', antiqueGold: '#C5A059', softGold: '#E6CA65',
                         silkVanilla: '#FAF6EE', creamAccent: '#F3ECE0', obsidian: '#121212', charcoal: '#1A1A1A',
+                        /* readable gold + warm text tones for the light (cream) sections */
+                        deepGold: '#7A5C18', cocoa: '#5C4636', cocoaSoft: '#6B5546',
                     },
                     fontFamily: {
                         playfair: ['Playfair Display', 'serif'],
@@ -56,6 +58,9 @@
         .rounded-xs { border-radius: 2px; }
         section[id] { scroll-margin-top: 84px; }
         :focus-visible { outline: 2px solid #D4AF37; outline-offset: 3px; }
+        /* Light pages: a subtle antique-gold dot texture on the cream background */
+        body { background-color: #FAF6EE; background-image: radial-gradient(circle, rgba(154, 118, 40, .2) 0 1.1px, transparent 1.7px); background-size: 26px 26px; }
+        .on-light :focus-visible { outline-color: #7A5C18; }
 
         @keyframes goldGlint { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
         .gold-shimmer {
@@ -66,6 +71,32 @@
             background: linear-gradient(135deg, #FAF6EE 0%, #D4AF37 50%, #C5A059 100%);
             -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
         }
+        /* ============ GOLD DOT FIELD (backgrounds) ============ */
+        /* Base grid of crisp gold dots + a sparser layer that twinkles, so the pattern reads clearly on large / high-DPI screens */
+        .dot-field { position: absolute; inset: 0; pointer-events: none; z-index: 0;
+            background-image: radial-gradient(circle, rgba(230, 202, 101, .55) 0 1.3px, transparent 1.9px);
+            background-size: 26px 26px;
+            -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 45%, #000 35%, rgba(0, 0, 0, .45) 100%);
+                    mask-image: radial-gradient(ellipse 85% 75% at 50% 45%, #000 35%, rgba(0, 0, 0, .45) 100%); }
+        .dot-field::after { content: ''; position: absolute; inset: 0;
+            background-image: radial-gradient(circle, rgba(255, 244, 205, .95) 0 1.7px, rgba(230, 202, 101, .35) 2.4px, transparent 4px);
+            background-size: 78px 78px; background-position: 13px 13px;
+            animation: dotTwinkle 3.6s ease-in-out infinite alternate; }
+        .dot-field.soft { opacity: .7; }
+        @keyframes dotTwinkle { from { opacity: .15; } to { opacity: .85; } }
+        /* Light sections: darker antique-gold dots so they show on cream */
+        .dot-field.on-light { background-image: radial-gradient(circle, rgba(154, 118, 40, .32) 0 1.2px, transparent 1.8px); }
+        .dot-field.on-light::after { background-image: radial-gradient(circle, rgba(184, 140, 46, .55) 0 1.6px, transparent 2.6px); }
+        .hero-dust { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+        .hero-dust b { position: absolute; bottom: -10px; width: var(--s); height: var(--s); border-radius: 50%; background: #F3DD8A; box-shadow: 0 0 8px 1px rgba(230, 202, 101, .8); opacity: 0; animation: dustRise var(--t) linear var(--d) infinite; }
+        .hero-mandala { position: absolute; width: 760px; height: 760px; right: -220px; top: 50%; margin-top: -380px; opacity: .18; pointer-events: none; }
+        .hero-mandala .spin { transform-origin: 100px 100px; animation: spin 120s linear infinite; }
+        .hero-mandala .draw { fill: none; stroke: #E6CA65; stroke-width: .5; }
+        .hero-mandala .draw.thin { stroke-width: .3; }
+        .hero-mandala .draw.lotus { stroke-width: 1; }
+        .hero-mandala .dot { fill: #E6CA65; }
+        @media (max-width: 1023px) { .hero-mandala { right: 50%; margin-right: -380px; opacity: .12; } }
+
         .filigree-border { border: 1px solid rgba(212, 175, 55, 0.3); position: relative; }
         .filigree-border::after { content: ''; position: absolute; inset: 3px; border: 1px solid rgba(212, 175, 55, 0.15); pointer-events: none; }
 
@@ -90,7 +121,7 @@
             background: radial-gradient(circle at var(--cx, 100%) 50%, rgba(90, 14, 26, .95) 0%, #2D040D 60%), #2D040D;
             transition: transform 1.15s cubic-bezier(.77, 0, .18, 1);
         }
-        .curtain::before { content: ''; position: absolute; inset: 0; opacity: .08; background-image: radial-gradient(#D4AF37 1px, transparent 1px); background-size: 22px 22px; }
+        .curtain::before { content: ''; position: absolute; inset: 0; opacity: .32; background-image: radial-gradient(circle, #E6CA65 0 1.3px, transparent 1.9px); background-size: 24px 24px; }
         .curtain.left { left: 0; --cx: 100%; }
         .curtain.right { right: 0; --cx: 0%; }
         .curtain::after {
@@ -408,8 +439,11 @@
 
     <!-- HERO -->
     <section id="hero" class="relative bg-richBurgundy text-silkVanilla min-h-[85vh] lg:min-h-[90vh] flex items-center overflow-hidden">
-        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#D4AF37_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none"></div>
         <div class="absolute -top-40 -left-40 w-[520px] h-[520px] rounded-full bg-deepCrimson/60 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-48 right-0 w-[560px] h-[560px] rounded-full bg-warmGold/10 blur-3xl pointer-events-none"></div>
+        <div class="dot-field"></div>
+        <svg class="hero-mandala" id="heroMandala" viewBox="0 0 200 200" aria-hidden="true"></svg>
+        <div class="hero-dust" id="heroDust" aria-hidden="true"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
@@ -479,7 +513,7 @@
     </div>
 
     <!-- SHOP BY CATEGORY -->
-    <section id="categories" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="categories" class="on-light py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div class="text-center space-y-3 mb-12 reveal-element">
             <span class="font-cormorant text-base sm:text-lg text-royalMaroon font-bold tracking-[0.3em] uppercase block">— Everything Indian, Under One Roof —</span>
             <h2 class="font-playfair text-3xl sm:text-5xl font-bold text-richBurgundy">Shop by Category</h2>
@@ -489,17 +523,18 @@
     </section>
 
     <!-- CATEGORY CHIPS -->
-    <section class="bg-royalMaroon border-y border-warmGold/30 py-6 px-4" id="chipBar">
-        <div id="categoryChips" class="max-w-7xl mx-auto flex items-center justify-start lg:justify-center gap-3 overflow-x-auto no-scrollbar pb-1 font-montserrat text-xs tracking-[0.15em] uppercase"></div>
+    <section class="relative overflow-hidden bg-royalMaroon border-y border-warmGold/30 py-6 px-4" id="chipBar">
+        <div class="dot-field soft"></div>
+        <div id="categoryChips" class="relative max-w-7xl mx-auto flex items-center justify-start lg:justify-center gap-3 overflow-x-auto no-scrollbar pb-1 font-montserrat text-xs tracking-[0.15em] uppercase"></div>
     </section>
 
     <!-- COLLECTION -->
-    <section id="collections" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="collections" class="on-light py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div class="text-center space-y-3 mb-12 reveal-element">
             <span class="font-cormorant text-base sm:text-lg text-royalMaroon font-bold tracking-[0.3em] uppercase block">— The Harshinee Collection —</span>
             <h2 class="font-playfair text-3xl sm:text-5xl font-bold text-richBurgundy">Latest in Store</h2>
             <div class="divider-draw h-[2px] bg-warmGold mx-auto my-4 relative"><span class="absolute -top-1.5 left-1/2 w-3 h-3 bg-warmGold"></span></div>
-            <p class="font-cormorant text-gray-700 text-lg sm:text-xl max-w-2xl mx-auto">Limited pieces — new arrivals every week. Ask us on WhatsApp for sizes and colours.</p>
+            <p class="font-cormorant text-cocoa text-lg sm:text-xl max-w-2xl mx-auto">Limited pieces — new arrivals every week. Ask us on WhatsApp for sizes and colours.</p>
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-4 mb-10 pb-4 border-b border-royalMaroon/10 font-montserrat text-xs">
@@ -515,7 +550,7 @@
                     <option value="low">Price: Low to High</option>
                     <option value="high">Price: High to Low</option>
                 </select>
-                <div class="text-gray-600 text-xs whitespace-nowrap"><span id="productCount" class="font-bold text-richBurgundy">0</span> pieces</div>
+                <div class="text-cocoaSoft text-xs whitespace-nowrap"><span id="productCount" class="font-bold text-richBurgundy">0</span> pieces</div>
             </div>
         </div>
 
@@ -530,7 +565,7 @@
 
     <!-- BRIDE & GROOM -->
     <section id="bride-groom" class="bg-richBurgundy text-silkVanilla py-20 px-4 sm:px-6 lg:px-8 border-y border-warmGold/30 relative overflow-hidden">
-        <div class="absolute inset-0 opacity-[0.06] bg-[radial-gradient(#D4AF37_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none"></div>
+        <div class="dot-field"></div>
         <div class="max-w-7xl mx-auto relative">
             <div class="text-center space-y-3 mb-14 reveal-element">
                 <span class="font-cormorant text-warmGold tracking-[0.3em] uppercase text-sm block font-bold">[ Wedding Season ]</span>
@@ -572,7 +607,8 @@
     <!-- EXPERIENCE QUOTE -->
     <section class="relative py-24 px-4 overflow-hidden">
         <img src="https://images.unsplash.com/photo-1735052712489-f45220126a0c?auto=format&fit=crop&w=1600&q=70" alt="" aria-hidden="true" class="absolute inset-0 w-full h-full object-cover" loading="lazy">
-        <div class="absolute inset-0 bg-richBurgundy/85"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-richBurgundy/90 via-richBurgundy/80 to-richBurgundy/90"></div>
+        <div class="dot-field soft"></div>
         <div class="relative max-w-3xl mx-auto text-center reveal-element">
             <i class="fa-solid fa-quote-left text-warmGold/60 text-3xl"></i>
             <p class="font-playfair italic text-2xl sm:text-4xl text-silkVanilla leading-snug mt-4">We don't just sell fashion, we create an experience. From the moment you step in, it's all about you.</p>
@@ -580,8 +616,41 @@
         </div>
     </section>
 
+    <!-- HOW IT WORKS -->
+    <section class="on-light relative overflow-hidden bg-creamAccent border-b border-warmGold/30 py-20 px-4 sm:px-6 lg:px-8">
+        <div class="dot-field on-light"></div>
+        <div class="relative max-w-6xl mx-auto">
+            <div class="text-center space-y-3 mb-20 reveal-element">
+                <span class="font-cormorant text-base sm:text-lg text-royalMaroon font-bold tracking-[0.3em] uppercase block">— Simple &amp; Personal —</span>
+                <h2 class="font-playfair text-3xl sm:text-5xl font-bold text-richBurgundy">How to Shop With Us</h2>
+                <div class="divider-draw h-[2px] bg-warmGold mx-auto my-4 relative"><span class="absolute -top-1.5 left-1/2 w-3 h-3 bg-warmGold"></span></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10 relative">
+                <div class="hidden md:block absolute top-0 left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-warmGold/60 to-transparent"></div>
+                <div class="reveal-element step-card relative text-center bg-silkVanilla border border-warmGold/30 rounded-sm px-6 pt-14 pb-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
+                    <span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-royalMaroon border-2 border-warmGold text-warmGold flex items-center justify-center text-2xl shadow-gold-glow"><i class="fa-regular fa-heart"></i></span>
+                    <span class="font-montserrat text-[10px] font-bold tracking-[0.3em] uppercase text-deepGold">Step 1</span>
+                    <h3 class="font-playfair text-xl font-bold text-richBurgundy mt-1">Browse &amp; Save</h3>
+                    <p class="font-cormorant text-cocoa text-lg mt-2 leading-snug">Explore the collection online and save the pieces you love to your wishlist or bag.</p>
+                </div>
+                <div class="reveal-element step-card relative text-center bg-silkVanilla border border-warmGold/30 rounded-sm px-6 pt-14 pb-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 mt-8 md:mt-0" style="transition-delay:.12s">
+                    <span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-royalMaroon border-2 border-warmGold text-warmGold flex items-center justify-center text-2xl shadow-gold-glow"><i class="fa-brands fa-whatsapp"></i></span>
+                    <span class="font-montserrat text-[10px] font-bold tracking-[0.3em] uppercase text-deepGold">Step 2</span>
+                    <h3 class="font-playfair text-xl font-bold text-richBurgundy mt-1">Message on WhatsApp</h3>
+                    <p class="font-cormorant text-cocoa text-lg mt-2 leading-snug">Send your bag or question in one tap — we'll confirm sizes, colours and availability.</p>
+                </div>
+                <div class="reveal-element step-card relative text-center bg-silkVanilla border border-warmGold/30 rounded-sm px-6 pt-14 pb-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 mt-8 md:mt-0" style="transition-delay:.24s">
+                    <span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-royalMaroon border-2 border-warmGold text-warmGold flex items-center justify-center text-2xl shadow-gold-glow"><i class="fa-solid fa-store"></i></span>
+                    <span class="font-montserrat text-[10px] font-bold tracking-[0.3em] uppercase text-deepGold">Step 3</span>
+                    <h3 class="font-playfair text-xl font-bold text-richBurgundy mt-1">Try On in Boutique</h3>
+                    <p class="font-cormorant text-cocoa text-lg mt-2 leading-snug">Visit Lallmatie or St Julien d'Hotman to try on, get alterations and take it home.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- VISIT US -->
-    <section id="visit" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="visit" class="on-light py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div class="text-center space-y-3 mb-12 reveal-element">
             <span class="font-cormorant text-base sm:text-lg text-royalMaroon font-bold tracking-[0.3em] uppercase block">— Come Say Hello —</span>
             <h2 class="font-playfair text-3xl sm:text-5xl font-bold text-richBurgundy">Visit Our Boutiques</h2>
@@ -593,21 +662,21 @@
                 <div class="reveal-element bg-creamAccent border border-warmGold/40 rounded-sm p-7 shadow-lg hover:shadow-2xl transition-shadow">
                     <span class="font-montserrat text-[10px] font-bold tracking-[0.25em] uppercase text-warmGold bg-royalMaroon px-2 py-1 rounded-xs">Boutique 1</span>
                     <h3 class="font-playfair text-2xl font-bold text-richBurgundy mt-3">Royal Road, Lallmatie</h3>
-                    <p class="font-cormorant text-gray-700 text-lg">Opposite Kalimaye</p>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Harshinee+Fashion+Royal+Road+Lallmatie+Mauritius" target="_blank" rel="noopener" class="inline-flex items-center gap-2 mt-4 font-montserrat text-[11px] font-bold tracking-[0.2em] uppercase text-royalMaroon hover:text-warmGold transition-colors"><i class="fa-solid fa-diamond-turn-right"></i> Get Directions</a>
+                    <p class="font-cormorant text-cocoa text-lg">Opposite Kalimaye</p>
+                    <a href="https://www.google.com/maps/search/?api=1&query=Harshinee+Fashion+Royal+Road+Lallmatie+Mauritius" target="_blank" rel="noopener" class="inline-flex items-center gap-2 mt-4 font-montserrat text-[11px] font-bold tracking-[0.2em] uppercase text-royalMaroon hover:text-deepGold transition-colors"><i class="fa-solid fa-diamond-turn-right"></i> Get Directions</a>
                 </div>
                 <div class="reveal-element bg-creamAccent border border-warmGold/40 rounded-sm p-7 shadow-lg hover:shadow-2xl transition-shadow" style="transition-delay:.1s">
                     <span class="font-montserrat text-[10px] font-bold tracking-[0.25em] uppercase text-richBurgundy bg-warmGold px-2 py-1 rounded-xs">Boutique 2 • Now Open</span>
                     <h3 class="font-playfair text-2xl font-bold text-richBurgundy mt-3">Bypass, St Julien d'Hotman</h3>
-                    <p class="font-cormorant text-gray-700 text-lg">Opposite Kalimaye</p>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Harshinee+Fashion+Bypass+St+Julien+d'Hotman+Mauritius" target="_blank" rel="noopener" class="inline-flex items-center gap-2 mt-4 font-montserrat text-[11px] font-bold tracking-[0.2em] uppercase text-royalMaroon hover:text-warmGold transition-colors"><i class="fa-solid fa-diamond-turn-right"></i> Get Directions</a>
+                    <p class="font-cormorant text-cocoa text-lg">Opposite Kalimaye</p>
+                    <a href="https://www.google.com/maps/search/?api=1&query=Harshinee+Fashion+Bypass+St+Julien+d'Hotman+Mauritius" target="_blank" rel="noopener" class="inline-flex items-center gap-2 mt-4 font-montserrat text-[11px] font-bold tracking-[0.2em] uppercase text-royalMaroon hover:text-deepGold transition-colors"><i class="fa-solid fa-diamond-turn-right"></i> Get Directions</a>
                 </div>
                 <div class="reveal-element flex flex-wrap gap-x-8 gap-y-3 font-montserrat text-sm text-richBurgundy" style="transition-delay:.2s">
-                    <a href="tel:+23057990933" class="hover:text-warmGold transition-colors"><i class="fa-solid fa-phone text-warmGold mr-2"></i>5799 0933</a>
-                    <a href="tel:+23052547777" class="hover:text-warmGold transition-colors"><i class="fa-solid fa-phone text-warmGold mr-2"></i>5254 7777</a>
-                    <a href="tel:+2304182082" class="hover:text-warmGold transition-colors"><i class="fa-solid fa-phone text-warmGold mr-2"></i>418 2082</a>
+                    <a href="tel:+23057990933" class="hover:text-deepGold transition-colors"><i class="fa-solid fa-phone text-deepGold mr-2"></i>5799 0933</a>
+                    <a href="tel:+23052547777" class="hover:text-deepGold transition-colors"><i class="fa-solid fa-phone text-deepGold mr-2"></i>5254 7777</a>
+                    <a href="tel:+2304182082" class="hover:text-deepGold transition-colors"><i class="fa-solid fa-phone text-deepGold mr-2"></i>418 2082</a>
                 </div>
-                <p class="reveal-element font-cormorant text-gray-600 text-lg"><i class="fa-brands fa-whatsapp text-emerald-700 mr-1"></i> Queries via WhatsApp only — <strong class="text-richBurgundy">5799 0933</strong></p>
+                <p class="reveal-element font-cormorant text-cocoaSoft text-lg"><i class="fa-brands fa-whatsapp text-emerald-700 mr-1"></i> Queries via WhatsApp only — <strong class="text-richBurgundy">5799 0933</strong></p>
             </div>
 
             <div class="lg:col-span-6 reveal-element bg-richBurgundy text-silkVanilla p-8 rounded-sm filigree-border shadow-2xl space-y-4" style="transition-delay:.15s">
@@ -650,30 +719,32 @@
     </section>
 
     <!-- SOCIAL -->
-    <section class="bg-creamAccent border-t border-warmGold/30 py-14 px-4">
-        <div class="max-w-5xl mx-auto text-center reveal-element">
+    <section class="on-light relative overflow-hidden bg-creamAccent border-t border-warmGold/30 py-14 px-4">
+        <div class="dot-field on-light"></div>
+        <div class="relative max-w-5xl mx-auto text-center reveal-element">
             <h3 class="font-playfair text-2xl sm:text-3xl font-bold text-richBurgundy">See new arrivals first</h3>
-            <p class="font-cormorant text-gray-700 text-lg mt-1">Daily videos, try-ons and offers on our socials.</p>
+            <p class="font-cormorant text-cocoa text-lg mt-1">Daily videos, try-ons and offers on our socials.</p>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 font-montserrat">
                 <a href="https://www.facebook.com/harshineefashionofficial/" target="_blank" rel="noopener" class="group bg-silkVanilla border border-warmGold/30 hover:border-warmGold p-5 rounded-sm flex items-center gap-4 transition-all hover:-translate-y-1 hover:shadow-xl">
                     <span class="w-12 h-12 rounded-full bg-royalMaroon text-warmGold flex items-center justify-center text-xl group-hover:scale-110 transition-transform"><i class="fa-brands fa-facebook-f"></i></span>
-                    <span class="text-left"><b class="block font-playfair text-xl text-richBurgundy">40K+</b><span class="text-[11px] tracking-widest uppercase text-gray-600">Facebook</span></span>
+                    <span class="text-left"><b class="block font-playfair text-xl text-richBurgundy">40K+</b><span class="text-[11px] tracking-widest uppercase text-cocoaSoft">Facebook</span></span>
                 </a>
                 <a href="https://www.instagram.com/harshineefashionofficial/" target="_blank" rel="noopener" class="group bg-silkVanilla border border-warmGold/30 hover:border-warmGold p-5 rounded-sm flex items-center gap-4 transition-all hover:-translate-y-1 hover:shadow-xl">
                     <span class="w-12 h-12 rounded-full bg-royalMaroon text-warmGold flex items-center justify-center text-xl group-hover:scale-110 transition-transform"><i class="fa-brands fa-instagram"></i></span>
-                    <span class="text-left"><b class="block font-playfair text-xl text-richBurgundy">13K</b><span class="text-[11px] tracking-widest uppercase text-gray-600">Instagram</span></span>
+                    <span class="text-left"><b class="block font-playfair text-xl text-richBurgundy">13K</b><span class="text-[11px] tracking-widest uppercase text-cocoaSoft">Instagram</span></span>
                 </a>
                 <a href="https://www.tiktok.com/@harshineefashionofficial" target="_blank" rel="noopener" class="group bg-silkVanilla border border-warmGold/30 hover:border-warmGold p-5 rounded-sm flex items-center gap-4 transition-all hover:-translate-y-1 hover:shadow-xl">
                     <span class="w-12 h-12 rounded-full bg-royalMaroon text-warmGold flex items-center justify-center text-xl group-hover:scale-110 transition-transform"><i class="fa-brands fa-tiktok"></i></span>
-                    <span class="text-left"><b class="block font-playfair text-xl text-richBurgundy">16K+</b><span class="text-[11px] tracking-widest uppercase text-gray-600">TikTok</span></span>
+                    <span class="text-left"><b class="block font-playfair text-xl text-richBurgundy">16K+</b><span class="text-[11px] tracking-widest uppercase text-cocoaSoft">TikTok</span></span>
                 </a>
             </div>
         </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-richBurgundy text-silkVanilla border-t border-warmGold/30 pt-16 pb-12 px-4 sm:px-6 lg:px-8 font-montserrat text-xs">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-warmGold/20">
+    <footer class="relative overflow-hidden bg-richBurgundy text-silkVanilla border-t border-warmGold/30 pt-16 pb-12 px-4 sm:px-6 lg:px-8 font-montserrat text-xs">
+        <div class="dot-field soft"></div>
+        <div class="relative max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-warmGold/20">
             <div class="space-y-4">
                 <a href="#hero" class="inline-block">
                     <span class="font-playfair text-2xl font-bold tracking-[0.22em] text-gold-gradient uppercase block">HARSHINEE</span>
@@ -707,9 +778,9 @@
                 </div>
             </div>
         </div>
-        <div class="max-w-7xl mx-auto pt-8 flex flex-col md:flex-row items-center justify-between gap-2 text-creamAccent/60 text-[11px]">
+        <div class="relative max-w-7xl mx-auto pt-8 flex flex-col md:flex-row items-center justify-between gap-2 text-creamAccent/60 text-[11px]">
             <p>© <span id="yearNow">2026</span> Harshinee Fashion, Mauritius. All rights reserved.</p>
-            <p class="text-creamAccent/40">Website by buildyourdreamwebsite.com</p>
+            <p class="text-creamAccent/60">Website by buildyourdreamwebsite.com</p>
         </div>
     </footer>
 
@@ -873,6 +944,19 @@
                 [{ key: 'all', label: 'All' }, ...CATEGORIES].map(c =>
                     `<button onclick="filterCategory('${c.key}')" data-cat="${c.key}" class="${chipBase} border-warmGold/30 text-silkVanilla hover:border-warmGold hover:text-warmGold">${c.label}</button>`).join('');
 
+            /* Hero: slow-turning background mandala + rising gold dust */
+            buildMandala(document.getElementById('heroMandala'));
+            const hd = document.getElementById('heroDust');
+            for (let h = 0; h < 22; h++) {
+                const hb = document.createElement('b');
+                hb.style.left = (Math.random() * 100) + '%';
+                hb.style.setProperty('--s', (1.5 + Math.random() * 3) + 'px');
+                hb.style.setProperty('--t', (9 + Math.random() * 9) + 's');
+                hb.style.setProperty('--d', (Math.random() * 9) + 's');
+                hb.style.setProperty('--x', ((Math.random() - 0.5) * 160) + 'px');
+                hd.appendChild(hb);
+            }
+
             document.getElementById('footerCats').innerHTML = CATEGORIES.map(c =>
                 `<li><a href="#" onclick="goToCategory('${c.key}'); return false;" class="hover:text-warmGold hover:pl-1 transition-all">${c.label}</a></li>`).join('');
         })();
@@ -925,7 +1009,7 @@
             grid.innerHTML = '';
 
             if (items.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-16 font-cormorant text-xl text-gray-600">
+                grid.innerHTML = `<div class="col-span-full text-center py-16 font-cormorant text-xl text-cocoaSoft">
                     <i class="fa-solid fa-gem text-3xl text-warmGold/60 mb-3 block"></i>Nothing found — but we get new pieces every week.
                     <button onclick="openWhatsApp('Hello Harshinee Fashion, I am looking for: ${filters.q.replace(/'/g, '')}')" class="block mx-auto mt-4 px-6 py-2.5 bg-emerald-700 text-white font-montserrat text-[11px] font-bold tracking-widest uppercase rounded-sm hover:bg-emerald-600 transition-colors"><i class="fa-brands fa-whatsapp mr-1"></i> Ask us on WhatsApp</button></div>`;
             }
